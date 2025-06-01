@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <style>
+        /* Estilos específicos para el chat para complementar style.css */
+        body {
+            display: flex; /* Cambiamos a flex para centrar mejor en el chat */
+            flex-direction: column; /* Apilamos los elementos verticalmente */
+            min-height: 100vh;
+            align-items: center; /* Centrado horizontal */
+            justify-content: flex-start; /* Alineado arriba */
+            padding: 20px; /* Espaciado general */
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 900px; /* Un poco más ancho para el chat */
+            width: 100%; /* Ocupa el ancho disponible */
+            padding: 30px;
+            margin: 0 auto; /* Centrado horizontal */
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Para que ocupe el espacio disponible en vertical */
+        }
+        header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Para que los elementos se envuelvan en pantallas pequeñas */
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em; /* Ajuste para móviles */
+        }
+        header p {
+            margin: 5px 0;
+            flex-basis: 100%; /* Ocupa toda la línea */
+            text-align: left;
+        }
+        .logout-btn {
+            background-color: #d9534f;
+            padding: 8px 15px;
+            font-size: 0.9em;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            transition: background-color 0.3s ease;
+            margin-left: auto; /* Empuja el botón a la derecha */
+        }
+        .logout-btn:hover {
+            background-color: #c9302c;
+        }
+
+        .chat-area {
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 400px;
+            max-height: calc(100vh - 250px); /* Ajustado para que no se salga de la pantalla en móviles */
+            overflow-y: auto;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Ocupa el espacio restante */
+            scroll-behavior: smooth; /* Desplazamiento suave */
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        .message strong {
+            color: var(--accent-color);
+            margin-right: 5px;
+            font-weight: 700; /* Más destacado */
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-top: auto; /* Empuja el input al final del container */
+        }
+        .chat-input input {
+            flex-grow: 1;
+            padding: 12px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1em;
+            outline: none;
+        }
+        .chat-input button {
+            padding: 12px 20px;
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            flex-shrink: 0; /* Evita que el botón se encoja */
+        }
+        .chat-input button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        footer {
+            margin-top: 20px; /* Menos margen inferior para responsive */
+            text-align: center;
+        }
+
+        /* Enlaces de administración (NUEVO) */
+        .admin-link {
+            display: block;
+            margin-top: 15px;
+            text-align: center;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .admin-link:hover {
+            color: var(--button-hover-bg);
+            text-decoration: underline;
+        }
+
+        /* Media Queries para responsividad */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 20px;
+                margin-bottom: 20px;
+                padding: 20px;
+            }
+            header h1 {
+                font-size: 1.8em;
+            }
+            .logout-btn {
+                margin-top: 10px;
+                margin-left: 0;
+                width: 100%; /* Ocupa todo el ancho */
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5em;
+                text-align: center;
+                width: 100%;
+            }
+            .chat-input {
+                flex-direction: column; /* Botón debajo del input en pantallas muy pequeñas */
+            }
+            .chat-input button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Chat de la Comunidad</h1>
+            <p>¡Hola, <span id="username-display">{{ username }}</span>! Bienvenido al chat.</p>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Cerrar Sesión</a>
+            {% if session.get('user_role') == 'admin' %}
+                <a href="{{ url_for('admin.manage_users') }}" class="admin-link">Administrar Usuarios</a>
+            {% endif %}
+        </header>
+
+        <main>
+            <div class="chat-area" id="chat-box">
+                </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
+                <button id="send-button">Enviar</button>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Gatito Sentimental. Hecho con ❤️</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const socket = io(); // Conecta al servidor de SocketIO
+
+        const chatBox = document.getElementById('chat-box');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const usernameDisplay = document.getElementById('username-display').textContent;
+
+        // Cuando el usuario entra al chat
+        socket.on('connect', function() {
+            socket.emit('join', { username: usernameDisplay });
+        });
+
+        // Manejar los mensajes entrantes
+        socket.on('message', function(data) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = data.msg;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        // Manejar mensajes de error del servidor (ej. si no está confirmado el email)
+        socket.on('error_message', function(data) {
+            alert(data.msg); // Podrías usar un div para mostrar esto de forma más bonita
+            window.location.href = '/'; // Redirigir al inicio o login
+        });
+
+        // Enviar mensaje al hacer click en el botón
+        sendButton.addEventListener('click', function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.emit('send_message', { username: usernameDisplay, message: message });
+                messageInput.value = '';
+            }
+        });
+
+        // Enviar mensaje al presionar Enter en el input
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        // Para cuando el usuario cierra la pestaña o navega fuera (menos fiable pero ayuda)
+        window.onbeforeunload = function() {
+            socket.emit('leave', { username: usernameDisplay });
+            socket.disconnect();
+        };
+    </script>
+</body>
+</html>

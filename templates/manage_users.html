@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Usuarios</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Estilos específicos para manage_users.html */
+        .admin-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: var(--secondary-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .admin-container h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .user-table th, .user-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        .user-table th {
+            background-color: var(--primary-bg);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+
+        .user-table tr:nth-child(even) {
+            background-color: #202020; /* Ligeramente más claro para filas pares */
+        }
+
+        .user-table td form {
+            display: inline-block;
+            margin: 0;
+        }
+
+        .user-table td .btn {
+            padding: 8px 12px;
+            font-size: 0.9em;
+            margin-right: 5px;
+            width: auto; /* Anulamos el width: 100% del btn general */
+        }
+
+        .btn-promote {
+            background-color: #28a745; /* Verde */
+        }
+
+        .btn-promote:hover {
+            background-color: #218838;
+        }
+
+        .btn-demote {
+            background-color: #ffc107; /* Amarillo */
+            color: var(--primary-bg); /* Texto oscuro para contraste */
+        }
+
+        .btn-demote:hover {
+            background-color: #e0a800;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--button-hover-bg);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Administración de Usuarios</h1>
+
+        <div class="flash-messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>
+                        {% if user.role == 'user' %}
+                            <form action="{{ url_for('set_user_role', user_id=user.id, role_name='admin') }}" method="POST">
+                                <button type="submit" class="btn btn-promote">Hacer Admin</button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('set_user_role', user_id=user.id, role_name='user') }}" method="POST">
+                                <button type="submit" class="btn btn-demote">Quitar Admin</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('chat') }}" class="back-link">Volver al Chat</a>
+    </div>
+</body>
+</html>

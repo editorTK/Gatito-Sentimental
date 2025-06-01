@@ -1,0 +1,223 @@
+/* static/style.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+:root {
+    --primary-bg: #1a1a1a; /* Fondo muy oscuro */
+    --secondary-bg: #2a2a2a; /* Fondo de secciones */
+    --text-color: #e0e0e0; /* Texto claro */
+    --accent-color: #00bcd4; /* Azul cian brillante para acentos, tipo TikTok */
+    --border-color: #444; /* Bordes sutiles */
+    --input-bg: #333; /* Fondo de inputs */
+    --placeholder-color: #888; /* Color de placeholder */
+    --button-bg: #00bcd4; /* Fondo de botón */
+    --button-hover-bg: #0097a7; /* Hover de botón */
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: var(--secondary-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    padding: 30px;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+
+header h1 {
+    color: var(--accent-color);
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+header p {
+    font-size: 0.9em;
+    color: var(--text-color);
+    margin-bottom: 20px;
+}
+
+main section {
+    background-color: var(--primary-bg);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+}
+
+main section h2 {
+    color: var(--accent-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 400;
+    color: var(--text-color);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: calc(100% - 20px); /* Ajuste para el padding */
+    padding: 12px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    font-size: 1em;
+    outline: none; /* Quitar el borde de enfoque por defecto */
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group input[type="email"]::placeholder,
+.form-group input[type="password"]::placeholder {
+    color: var(--placeholder-color);
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(0, 188, 212, 0.5); /* Sombra de enfoque */
+}
+
+.btn {
+    background-color: var(--button-bg);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.register-text {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: var(--text-color);
+}
+
+.register-text a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.register-text a:hover {
+    color: var(--button-hover-bg);
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 30px;
+    font-size: 0.8em;
+    color: var(--placeholder-color);
+}
+
+.hidden {
+    display: none;
+}
+
+/* static/style.css */
+
+/* ... tus estilos existentes ... */
+
+/* Estilos para mensajes flash */
+.flash-messages {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+.alert-success {
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: 1px solid #218838;
+}
+
+.alert-error {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+    border: 1px solid #c82333;
+}
+
+.alert-info {
+    background-color: #17a2b8; /* Azul claro */
+    color: white;
+    border: 1px solid #138496;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-left: 10px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.close-btn:hover {
+    opacity: 1;
+}
+
+/* Estilos para mostrar/ocultar contraseña */
+.password-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-container input {
+    padding-right: 40px; /* Espacio para el icono */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--placeholder-color);
+    font-size: 1.2em;
+}

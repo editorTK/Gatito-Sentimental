@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gatito Sentimental - ¡Conéctate!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Estilo para el campo honeypot - ¡CRUCIAL para que sea invisible! */
+        .honeypot-field {
+            position: absolute;
+            left: -9999px; /* Mueve el campo fuera de la vista */
+            top: -9999px;
+            opacity: 0; /* Lo hace completamente transparente */
+            height: 0;
+            width: 0;
+            z-index: -1;
+            pointer-events: none; /* No interactuable */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bienvenido a Gatito Sentimental</h1>
+            <p>El punto de encuentro para todos los miembros de nuestra comunidad.</p>
+        </header>
+
+        <main>
+            <div class="flash-messages">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </div>
+
+            <section class="login-section {% if 'show_register' in request.args %}hidden{% endif %}">
+                <h2>Iniciar Sesión</h2>
+                <form id="login-form" action="{{ url_for('auth.login') }}" method="POST">
+                    <div class="form-group">
+                        <label for="username">Usuario:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña:</label>
+                        <div class="password-input-container">
+                            <input type="password" id="password" name="password" required>
+                            <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn">Entrar</button>
+                </form>
+                <p class="register-text">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
+            </section>
+
+            <section class="register-section {% if 'show_register' not in request.args %}hidden{% endif %}">
+                <h2>Registrarse</h2>
+                <form id="register-form" action="{{ url_for('auth.register') }}" method="POST">
+                    <div class="form-group">
+                        <label for="reg-username">Usuario:</label>
+                        <input type="text" id="reg-username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email">Correo Electrónico:</label>
+                        <input type="email" id="reg-email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password">Contraseña:</label>
+                        <div class="password-input-container">
+                            <input type="password" id="reg-password" name="password" required minlength="6">
+                            <span class="toggle-password" onclick="togglePasswordVisibility('reg-password')">👁️</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-confirm-password">Confirmar Contraseña:</label>
+                        <div class="password-input-container">
+                            <input type="password" id="reg-confirm-password" name="confirm_password" required minlength="6">
+                            <span class="toggle-password" onclick="togglePasswordVisibility('reg-confirm-password')">👁️</span>
+                        </div>
+                    </div>
+                    <div class="form-group honeypot-field">
+                        <label for="hp-field">Por favor, no rellenes este campo:</label>
+                        <input type="text" id="hp-field" name="honeypot_field" tabindex="-1" autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn">Crear Cuenta</button>
+                </form>
+                <p class="register-text">¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar Sesión</a></p>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Gatito Sentimental. Hecho con ❤️</p>
+        </footer>
+    </div>
+
+    <script>
+        // Pequeño script para alternar entre formularios de login y registro
+        document.getElementById('show-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.login-section').classList.add('hidden');
+            document.querySelector('.register-section').classList.remove('hidden');
+            // Eliminar la visibilidad de los mensajes flash al cambiar de sección
+            const flashMessages = document.querySelector('.flash-messages');
+            if (flashMessages) flashMessages.innerHTML = '';
+        });
+
+        document.getElementById('show-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.register-section').classList.add('hidden');
+            document.querySelector('.login-section').classList.remove('hidden');
+            // Eliminar la visibilidad de los mensajes flash al cambiar de sección
+            const flashMessages = document.querySelector('.flash-messages');
+            if (flashMessages) flashMessages.innerHTML = '';
+        });
+
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const toggle = input.nextElementSibling; // El span es el siguiente hermano
+
+            if (input.type === "password") {
+                input.type = "text";
+                toggle.textContent = "🙈"; // Icono de ojo tachado
+            } else {
+                input.type = "password";
+                toggle.textContent = "👁️"; // Icono de ojo
+            }
+        }
+    </script>
+</body>
+</html>
