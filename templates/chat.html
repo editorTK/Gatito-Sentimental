@@ -3,242 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Gatito Sentimental - Chat</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" 
+          href="https://fonts.googleapis.com/css2?display=swap&family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800" />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+    
     <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <style>
-        /* Estilos específicos para el chat para complementar style.css */
-        body {
-            display: flex; /* Cambiamos a flex para centrar mejor en el chat */
-            flex-direction: column; /* Apilamos los elementos verticalmente */
-            min-height: 100vh;
-            align-items: center; /* Centrado horizontal */
-            justify-content: flex-start; /* Alineado arriba */
-            padding: 20px; /* Espaciado general */
-            box-sizing: border-box;
-        }
-        .container {
-            max-width: 900px; /* Un poco más ancho para el chat */
-            width: 100%; /* Ocupa el ancho disponible */
-            padding: 30px;
-            margin: 0 auto; /* Centrado horizontal */
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1; /* Para que ocupe el espacio disponible en vertical */
-        }
-        header {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap; /* Para que los elementos se envuelvan en pantallas pequeñas */
-        }
-        header h1 {
-            margin: 0;
-            font-size: 2em; /* Ajuste para móviles */
-        }
-        header p {
-            margin: 5px 0;
-            flex-basis: 100%; /* Ocupa toda la línea */
-            text-align: left;
-        }
-        .logout-btn {
-            background-color: #d9534f;
-            padding: 8px 15px;
-            font-size: 0.9em;
-            border-radius: 5px;
-            text-decoration: none;
-            color: white;
-            transition: background-color 0.3s ease;
-            margin-left: auto; /* Empuja el botón a la derecha */
-        }
-        .logout-btn:hover {
-            background-color: #c9302c;
-        }
-
-        .chat-area {
-            background-color: var(--primary-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            min-height: 400px;
-            max-height: calc(100vh - 250px); /* Ajustado para que no se salga de la pantalla en móviles */
-            overflow-y: auto;
-            margin-bottom: 15px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1; /* Ocupa el espacio restante */
-            scroll-behavior: smooth; /* Desplazamiento suave */
-        }
-        .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 6px;
-            background-color: var(--input-bg);
-            word-wrap: break-word;
-            line-height: 1.5;
-        }
-        .message strong {
-            color: var(--accent-color);
-            margin-right: 5px;
-            font-weight: 700; /* Más destacado */
-        }
-        .chat-input {
-            display: flex;
-            gap: 10px;
-            margin-top: auto; /* Empuja el input al final del container */
-        }
-        .chat-input input {
-            flex-grow: 1;
-            padding: 12px 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 1em;
-            outline: none;
-        }
-        .chat-input button {
-            padding: 12px 20px;
-            background-color: var(--button-bg);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            flex-shrink: 0; /* Evita que el botón se encoja */
-        }
-        .chat-input button:hover {
-            background-color: var(--button-hover-bg);
-        }
-
-        footer {
-            margin-top: 20px; /* Menos margen inferior para responsive */
-            text-align: center;
-        }
-
-        /* Enlaces de administración (NUEVO) */
-        .admin-link {
-            display: block;
-            margin-top: 15px;
-            text-align: center;
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-        .admin-link:hover {
-            color: var(--button-hover-bg);
-            text-decoration: underline;
-        }
-
-        /* Media Queries para responsividad */
-        @media (max-width: 768px) {
-            .container {
-                margin-top: 20px;
-                margin-bottom: 20px;
-                padding: 20px;
-            }
-            header h1 {
-                font-size: 1.8em;
-            }
-            .logout-btn {
-                margin-top: 10px;
-                margin-left: 0;
-                width: 100%; /* Ocupa todo el ancho */
-            }
-        }
-
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.5em;
-                text-align: center;
-                width: 100%;
-            }
-            .chat-input {
-                flex-direction: column; /* Botón debajo del input en pantallas muy pequeñas */
-            }
-            .chat-input button {
-                width: 100%;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Chat de la Comunidad</h1>
-            <p>¡Hola, <span id="username-display">{{ username }}</span>! Bienvenido al chat.</p>
-            <a href="{{ url_for('auth.logout') }}" class="logout-btn">Cerrar Sesión</a>
-            {% if session.get('user_role') == 'admin' %}
-                <a href="{{ url_for('admin.manage_users') }}" class="admin-link">Administrar Usuarios</a>
-            {% endif %}
-        </header>
-
-        <main>
-            <div class="chat-area" id="chat-box">
+<body class="relative flex size-full min-h-screen flex-col bg-[#141a1f] dark group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+        <div class="px-4 md:px-40 flex flex-1 justify-center py-5">
+            <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+                <div class="flex flex-wrap justify-between gap-3 p-4">
+                    <p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">
+                        Chat de la Comunidad
+                    </p>
+                    <div class="relative flex items-center">
+                    <button id="user-menu-toggle" class="flex items-center justify-center p-2 rounded-full bg-[#2b3640] hover:bg-[#3A4550] transition-colors duration-200">
+                        <span class="text-white text-base font-medium leading-normal mr-2">
+                            {% if session.username %}
+                                {{ session.username }}
+                            {% else %}
+                                Usuario
+                            {% endif %}
+                        </span>
+                        <div class="text-[#9daebe]" data-icon="Gear" data-size="24px" data-weight="regular">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160Zm88-29.84q.06-2.16,0-4.32l14.92-18.64a8,8,0,0,0,1.48-7.06,107.21,107.21,0,0,0-10.88-26.25,8,8,0,0,0-6-3.93l-23.72-2.64q-1.48-1.56-3-3L186,40.54a8,8,0,0,0-3.94-6,107.71,107.71,0,0,0-26.25-10.87,8,8,0,0,0-7.06,1.49L130.16,40Q128,40,125.84,40L107.2,25.11a8,8,0,0,0-7.06-1.48A107.6,107.6,0,0,0,73.89,34.51a8,8,0,0,0-3.93,6L67.32,64.27q-1.56,1.49-3,3L40.54,70a8,8,0,0,0-6,3.94,107.71,107.71,0,0,0-10.87,26.25,8,8,0,0,0,1.49,7.06L40,125.84Q40,128,40,130.16L25.11,148.8a8,8,0,0,0-1.48,7.06,107.21,107.21,0,0,0,10.88,26.25,8,8,0,0,0,6,3.93l23.72,2.64q1.49,1.56,3,3L70,215.46a8,8,0,0,0,3.94,6,107.71,107.71,0,0,0,26.25,10.87,8,8,0,0,0,7.06-1.49L125.84,216q2.16.06,4.32,0l18.64,14.92a8,8,0,0,0,7.06,1.48,107.21,107.21,0,0,0,26.25-10.88,8,8,0,0,0,3.93-6l2.64-23.72q1.56-1.48,3-3L215.46,186a8,8,0,0,0,6-3.94,107.71,107.71,0,0,0,10.87-26.25,8,8,0,0,0-1.49-7.06Zm-16.1-6.5a73.93,73.93,0,0,1,0,8.68,8,8,0,0,0,1.74,5.48l14.19,17.73a91.57,91.57,0,0,1-6.23,15L187,173.11a8,8,0,0,0-5.1,2.64,74.11,74.11,0,0,1-6.14,6.14,8,8,0,0,0-2.64,5.1l-2.51,22.58a91.32,91.32,0,0,1-15,6.23l-17.74-14.19a8,8,0,0,0-5-1.75h-.48a73.93,73.93,0,0,1-8.68,0,8,8,0,0,0-5.48,1.74L100.45,215.8a91.57,91.57,0,0,1-15-6.23L82.89,187a8,8,0,0,0-2.64-5.1,74.11,74.11,0,0,1-6.14-6.14,8,8,0,0,0-5.1-2.64L46.43,170.6a91.32,91.32,0,0,1-6.23-15l14.19-17.74a8,8,0,0,0,1.74-5.48,73.93,73.93,0,0,1,0-8.68,8,8,0,0,0-1.74-5.48L40.2,100.45a91.57,91.57,0,0,1,6.23-15L69,82.89a8,8,0,0,0,5.1-2.64,74.11,74.11,0,0,1,6.14-6.14A8,8,0,0,0,82.89,69L85.4,46.43a91.32,91.32,0,0,1,15-6.23l17.74,14.19a8,8,0,0,0,5.48,1.74,73.93,73.93,0,0,1,8.68,0,8,8,0,0,0,5.48-1.74L155.55,40.2a91.57,91.57,0,0,1,15,6.23L173.11,69a8,8,0,0,0,2.64,5.1,74.11,74.11,0,0,1,6.14,6.14,8,8,0,0,0,5.1,2.64l22.58,2.51a91.32,91.32,0,0,1,6.23,15l-14.19,17.74A8,8,0,0,0,199.87,123.66Z"></path>
+                                </svg>
+                            </div>
+                        </button>
+                        <div id="user-menu" class="user-menu-dropdown hidden absolute top-full right-0 bg-[#2b3640] rounded-xl shadow-lg mt-2 z-10 min-w-[180px]">
+                            <a href="{{ url_for('main.profile') }}" class="block px-4 py-3 text-white hover:bg-[#3A4550] rounded-t-xl">Perfil</a>
+                            {% if session.get('user_role') == 'admin' %}
+                                <a href="{{ url_for('admin.manage_users') }}" class="block px-4 py-3 text-white hover:bg-[#3A4550]">Administrar Usuarios</a>
+                            {% endif %}
+                            <a href="{{ url_for('auth.logout') }}" class="block px-4 py-3 text-[#dc3545] hover:bg-[#3A4550] rounded-b-xl">Cerrar Sesión</a>
+                        </div>
+                    </div>
                 </div>
-            <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Escribe tu mensaje...">
-                <button id="send-button">Enviar</button>
-            </div>
-        </main>
 
-        <footer>
-            <p>&copy; 2025 Gatito Sentimental. Hecho con ❤️</p>
-        </footer>
+
+                <div id="chat-box" class="flex flex-col flex-1 overflow-y-auto px-4 py-3 bg-[#111B21] rounded-lg">
+                    </div>
+
+                <div class="flex items-center px-4 py-3 gap-3 @container mt-auto">
+                    <label class="flex flex-col min-w-40 h-12 flex-1">
+                        <div class="flex w-full flex-1 items-stretch rounded-xl h-full">
+                            <input
+                                type="text" id="message-input" placeholder="Escribe un mensaje"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border-none bg-[#2b3640] focus:border-none h-full placeholder:text-[#9daebe] px-4 rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal"
+                            />
+                            <div class="flex border-none bg-[#2b3640] items-center justify-center pr-4 rounded-r-xl border-l-0 !pr-2">
+                                <div class="flex items-center gap-4 justify-end">
+                                    <div class="flex items-center gap-1">
+                                        <button class="flex items-center justify-center p-1.5">
+                                            <div class="text-[#9daebe]" data-icon="Image" data-size="20px" data-weight="regular">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                                                <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,16V158.75l-26.07-26.06a16,16,0,0,0-22.63,0l-20,20-44-44a16,16,0,0,0-22.62,0L40,149.37V56ZM40,172l52-52,80,80H40Zm176,28H194.63l-36-36,20-20L216,181.38V200ZM144,100a12,12,0,1,1,12,12A12,12,0,0,1,144,100Z"></path>
+                                                </svg>
+                                            </div>
+                                        </button>
+                                       <button id="send-button"
+    class="min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-8 px-4 bg-[#dce8f3] text-[#141a1f] text-sm font-medium leading-normal"
+>
+    <span class="truncate">Enviar</span>
+</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-    <script>
-        const socket = io(); // Conecta al servidor de SocketIO
-
-        const chatBox = document.getElementById('chat-box');
-        const messageInput = document.getElementById('message-input');
-        const sendButton = document.getElementById('send-button');
-        const usernameDisplay = document.getElementById('username-display').textContent;
-
-        // Cuando el usuario entra al chat
-        socket.on('connect', function() {
-            socket.emit('join', { username: usernameDisplay });
-        });
-
-        // Manejar los mensajes entrantes
-        socket.on('message', function(data) {
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message');
-            messageElement.innerHTML = data.msg;
-            chatBox.appendChild(messageElement);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
-
-        // Manejar mensajes de error del servidor (ej. si no está confirmado el email)
-        socket.on('error_message', function(data) {
-            alert(data.msg); // Podrías usar un div para mostrar esto de forma más bonita
-            window.location.href = '/'; // Redirigir al inicio o login
-        });
-
-        // Enviar mensaje al hacer click en el botón
-        sendButton.addEventListener('click', function() {
-            const message = messageInput.value.trim();
-            if (message) {
-                socket.emit('send_message', { username: usernameDisplay, message: message });
-                messageInput.value = '';
-            }
-        });
-
-        // Enviar mensaje al presionar Enter en el input
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendButton.click();
-            }
-        });
-
-        // Para cuando el usuario cierra la pestaña o navega fuera (menos fiable pero ayuda)
-        window.onbeforeunload = function() {
-            socket.emit('leave', { username: usernameDisplay });
-            socket.disconnect();
-        };
-    </script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
 </body>
 </html>

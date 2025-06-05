@@ -128,11 +128,11 @@
                     <td>{{ user.role }}</td>
                     <td>
                         {% if user.role == 'user' %}
-                            <form action="{{ url_for('set_user_role', user_id=user.id, role_name='admin') }}" method="POST">
+                            <form action="{{ url_for('admin.set_user_role', user_id=user.id, role_name='admin') }}" method="POST">
                                 <button type="submit" class="btn btn-promote">Hacer Admin</button>
                             </form>
                         {% else %}
-                            <form action="{{ url_for('set_user_role', user_id=user.id, role_name='user') }}" method="POST">
+                            <form action="{{ url_for('admin.set_user_role', user_id=user.id, role_name='user') }}" method="POST">
                                 <button type="submit" class="btn btn-demote">Quitar Admin</button>
                             </form>
                         {% endif %}
@@ -142,7 +142,7 @@
             </tbody>
         </table>
 
-        <a href="{{ url_for('chat') }}" class="back-link">Volver al Chat</a>
+        <a href="{{ url_for('main.chat') }}" class="back-link">Volver al Chat</a>
     </div>
 </body>
 </html>

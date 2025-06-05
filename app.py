@@ -1,5 +1,6 @@
+# app.py (Este es el archivo principal que inicia todo)
 
-from flask import Flask, session
+from flask import Flask, session, current_app, jsonify # Agregamos jsonify para un posible uso futuro si lo necesitas
 from flask_mail import Mail
 from flask_socketio import SocketIO
 import logging
@@ -21,6 +22,7 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     mail = Mail(app)
+    # ¡Importante! Asegúrate de que socketio se inicialice con el objeto app
     socketio = SocketIO(app)
 
     # Adjuntar 'mail' a la app para que esté disponible en las rutas
@@ -33,6 +35,9 @@ def create_app():
 
     # Registrar eventos de SocketIO
     register_chat_events(socketio)
+
+    # NO necesitamos una ruta /get_chat_key aquí
+    # porque la clave la pasamos directamente en render_template en main.py
 
     return app, socketio
 
@@ -52,4 +57,4 @@ if __name__ == '__main__':
 
     # Usar eventlet para un servidor de WebSockets más robusto
     # allow_unsafe_werkzeug=True solo para desarrollo
-    socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)

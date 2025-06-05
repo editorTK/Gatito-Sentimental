@@ -1,136 +1,307 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gatito Sentimental - ¡Conéctate!</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        /* Estilo para el campo honeypot - ¡CRUCIAL para que sea invisible! */
-        .honeypot-field {
-            position: absolute;
-            left: -9999px; /* Mueve el campo fuera de la vista */
-            top: -9999px;
-            opacity: 0; /* Lo hace completamente transparente */
-            height: 0;
-            width: 0;
-            z-index: -1;
-            pointer-events: none; /* No interactuable */
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Bienvenido a Gatito Sentimental</h1>
-            <p>El punto de encuentro para todos los miembros de nuestra comunidad.</p>
-        </header>
+<!DOCTYPE html>  <html lang="es">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>{% block title %}Gatito Sentimental - ¡Conéctate!{% endblock %}</title>  <style>  
+    /* Estilos generales - Modo Oscuro */  
+    body {  
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  
+        background-color: #181818; /* Fondo oscuro */  
+        color: #f0f0f0; /* Texto claro */  
+        margin: 0;  
+        display: flex;  
+        justify-content: center;  
+        align-items: center;  
+        min-height: 100vh;  
+    }  
+    .container {  
+        background-color: #222; /* Contenedor más oscuro */  
+        padding: 30px;  
+        border-radius: 8px;  
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */  
+        width: 100%;  
+        max-width: 400px;  
+        box-sizing: border-box;  
+    }  
+    header {  
+        text-align: center;  
+        margin-bottom: 25px;  
+        color: #f0f0f0;  
+    }  
+    h1 {  
+        margin-bottom: 5px;  
+    }  
+    p {  
+        color: #aaa;  
+        margin-bottom: 15px;  
+    }  
+    main {  
+        padding: 0;  
+    }  
+    section {  
+        margin-bottom: 25px;  
+        padding: 15px;  
+        border: 1px solid #333; /* Borde más oscuro */  
+        border-radius: 5px;  
+        background-color: #333; /* Fondo de sección más oscuro */  
+    }  
+    h2 {  
+        text-align: center;  
+        color: #f0f0f0;  
+        margin-bottom: 20px;  
+    }  
+    .form-group {  
+        margin-bottom: 20px;  
+    }  
+    label {  
+        display: block;  
+        margin-bottom: 8px;  
+        color: #ddd;  
+        font-weight: bold;  
+    }  
+    input[type="text"],  
+    input[type="password"],  
+    input[type="email"] {  
+        width: 100%; /* Ajustado para ocupar todo el espacio */  
+        padding: 12px;  
+        border: 1px solid #555;  
+        border-radius: 5px;  
+        box-sizing: border-box;  
+        font-size: 1em;  
+        margin-bottom: 10px;  
+        background-color: #444; /* Fondo de input oscuro */  
+        color: #f0f0f0;  
+        padding-right: 40px; /* Espacio para el icono */  
+    }  
+    .password-input-container {  
+        position: relative;  
+        display: flex;  
+        align-items: center;  
+    }  
+    .toggle-password {  
+        position: absolute;  
+        right: 10px;  
+        top: 50%;  
+        transform: translateY(-50%);  
+        cursor: pointer;  
+        user-select: none;  
+        width: 22px; /* Tamaño del icono */  
+        height: 22px; /* Tamaño del icono */  
+    }  
+    .btn {  
+        background-color: #007bff;  
+        color: white;  
+        padding: 12px 15px;  
+        border: none;  
+        border-radius: 5px;  
+        cursor: pointer;  
+        font-size: 1.1em;  
+        width: 100%;  
+        transition: background-color 0.3s ease;  
+    }  
+    .btn:hover {  
+        background-color: #0056b3;  
+    }  
+    .register-text, .forgot-password {  
+        text-align: center;  
+        margin-top: 15px;  
+    }  
+    .register-text a, .forgot-password a {  
+        color: #007bff;  
+        text-decoration: none;  
+    }  
+    .register-text a:hover, .forgot-password a:hover {  
+        text-decoration: underline;  
+    }  
+    .flash-messages {  
+        margin-bottom: 20px;  
+    }  
+    .alert {  
+        padding: 15px;  
+        margin-bottom: 15px;  
+        border-radius: 5px;  
+        position: relative;  
+    }  
+    .alert-success {  
+        background-color: #28a745; /* Verde oscuro */  
+        color: #fff;  
+        border: 1px solid #218838;  
+    }  
+    .alert-danger {  
+        background-color: #dc3545; /* Rojo oscuro */  
+        color: #fff;  
+        border: 1px solid #c82333;  
+    }  
+    .alert-info {  
+        background-color: #17a2b8; /* Azul claro oscuro */  
+        color: #fff;  
+        border: 1px solid #138496;  
+    }  
+    .alert-warning {  
+        background-color: #ffc107; /* Amarillo oscuro */  
+        color: #212529;  
+        border: 1px solid #e0a800;  
+    }  
+    .close-btn {  
+        position: absolute;  
+        top: 8px;  
+        right: 15px;  
+        border: none;  
+        background: none;  
+        color: #ccc;  
+        font-size: 1.2em;  
+        cursor: pointer;  
+        line-height: 1;  
+    }  
+    .hidden {  
+        display: none !important;  
+    }  
+    .honeypot-field {  
+        position: absolute;  
+        left: -9999px;  
+        top: -9999px;  
+        opacity: 0;  
+        height: 0;  
+        width: 0;  
+        z-index: -1;  
+        pointer-events: none;  
+    }  
+    footer {  
+        text-align: center;  
+        margin-top: 25px;  
+        color: #aaa;  
+        font-size: 0.9em;  
+    }  
+</style>
 
-        <main>
-            <div class="flash-messages">
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">
-                                {{ message }}
-                                <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
+</head>  
+<body>  
+    <div class="container">  
+        <header>  
+            <h1>Gatito Sentimental</h1>  
+            <p>¡Conéctate con nuestra comunidad!</p>  
+        </header>  <main>  
+        <div class="flash-messages">  
+            {% with messages = get_flashed_messages(with_categories=true) %}  
+                {% if messages %}  
+                    {% for category, message in messages %}  
+                        <div class="alert alert-{{ category }}">  
+                            {{ message }}  
+                            <button type="button" class="close-btn" onclick="this.parentElement.style.display='none';">&times;</button>  
+                        </div>  
+                    {% endfor %}  
+                {% endif %}  
+            {% endwith %}  
+        </div>  
 
-            <section class="login-section {% if 'show_register' in request.args %}hidden{% endif %}">
-                <h2>Iniciar Sesión</h2>
-                <form id="login-form" action="{{ url_for('auth.login') }}" method="POST">
-                    <div class="form-group">
-                        <label for="username">Usuario:</label>
-                        <input type="text" id="username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Contraseña:</label>
-                        <div class="password-input-container">
-                            <input type="password" id="password" name="password" required>
-                            <span class="toggle-password" onclick="togglePasswordVisibility('password')">👁️</span>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn">Entrar</button>
-                </form>
-                <p class="register-text">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
-            </section>
+        {% block content %}  
+        <section class="login-section {% if 'show_register' in request.args %}hidden{% endif %}">  
+            <h2>Iniciar Sesión</h2>  
+            <form id="login-form" action="{{ url_for('auth.login') }}" method="POST">  
+                <div class="form-group">  
+                    <label for="username">Usuario:</label>  
+                    <input type="text" id="username" name="username" required>  
+                </div>  
+                <div class="form-group">  
+                    <label for="password">Contraseña:</label>  
+                    <div class="password-input-container">  
+                        <input type="password" id="password" name="password" required>  
+                        <img src="{{ url_for('static', filename='images/closed-eye.png') }}" class="toggle-password" onclick="togglePasswordVisibility('password', this)" alt="Mostrar contraseña">  
+                    </div>  
+                </div>  
+                <button type="submit" class="btn">Entrar</button>  
+            </form>  
+            <div class="forgot-password">  
+                <a href="{{ url_for('auth.forgot_password') }}">¿Olvidaste tu contraseña?</a>  
+            </div>  
+            <p class="register-text">¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>  
+        </section>  
 
-            <section class="register-section {% if 'show_register' not in request.args %}hidden{% endif %}">
-                <h2>Registrarse</h2>
-                <form id="register-form" action="{{ url_for('auth.register') }}" method="POST">
-                    <div class="form-group">
-                        <label for="reg-username">Usuario:</label>
-                        <input type="text" id="reg-username" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-email">Correo Electrónico:</label>
-                        <input type="email" id="reg-email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-password">Contraseña:</label>
-                        <div class="password-input-container">
-                            <input type="password" id="reg-password" name="password" required minlength="6">
-                            <span class="toggle-password" onclick="togglePasswordVisibility('reg-password')">👁️</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-confirm-password">Confirmar Contraseña:</label>
-                        <div class="password-input-container">
-                            <input type="password" id="reg-confirm-password" name="confirm_password" required minlength="6">
-                            <span class="toggle-password" onclick="togglePasswordVisibility('reg-confirm-password')">👁️</span>
-                        </div>
-                    </div>
-                    <div class="form-group honeypot-field">
-                        <label for="hp-field">Por favor, no rellenes este campo:</label>
-                        <input type="text" id="hp-field" name="honeypot_field" tabindex="-1" autocomplete="off">
-                    </div>
-                    <button type="submit" class="btn">Crear Cuenta</button>
-                </form>
-                <p class="register-text">¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar Sesión</a></p>
-            </section>
-        </main>
+                   <section class="register-section {% if 'show_register' not in request.args %}hidden{% endif %}">  
+            <h2>Registrarse</h2>  
+            <form id="register-form" action="{{ url_for('auth.register') }}" method="POST">  
+                <div class="form-group">  
+                    <label for="reg-username">Usuario:</label>  
+                    <input type="text" id="reg-username" name="username" required>  
+                </div>  
+                <div class="form-group">  
+                    <label for="reg-email">Correo Electrónico:</label>  
+                    <input type="email" id="reg-email" name="email" required>  
+                </div>  
+                <div class="form-group">  
+                    <label for="reg-password">Contraseña:</label>  
+                    <div class="password-input-container">  
+                        <input type="password" id="reg-password" name="password" required minlength="6">  
+                        <img src="{{ url_for('static', filename='images/closed-eye.png') }}" class="toggle-password" onclick="togglePasswordVisibility('reg-password', this)" alt="Mostrar contraseña">  
+                    </div>  
+                </div>  
+                <div class="form-group">  
+                    <label for="reg-confirm-password">Confirmar Contraseña:</label>  
+                    <div class="password-input-container">  
+                        <input type="password" id="reg-confirm-password" name="confirm_password" required minlength="6">  
+                        <img src="{{ url_for('static', filename='images/closed-eye.png') }}" class="toggle-password" onclick="togglePasswordVisibility('reg-confirm-password', this)" alt="Mostrar contraseña">  
+                    </div>  
+                </div>  
+                <div class="form-group">  
+                    <div style="display: flex; align-items: center;">  
+                        <input type="checkbox" id="terms" name="terms" required>  
+                        <label for="terms" style="margin-bottom: 0; margin-left: 5px;">  
+                            Acepto los <a href="/terms" target="_blank">Términos de Uso</a> y la <a href="/privacy" target="_blank">Política de Privacidad</a>.  
+                        </label>  
+                    </div>  
+                </div>  
+                <div class="form-group honeypot-field">  
+                    <label for="hp-field">Por favor, no rellenes este campo:</label>  
+                    <input type="text" id="hp-field" name="honeypot_field" tabindex="-1" autocomplete="off">  
+                </div>  
+                <button type="submit" class="btn">Crear Cuenta</button>  
+            </form>  
+            <p class="register-text">¿Ya tienes cuenta? <a href="#" id="show-login">Iniciar Sesión</a></p>  
+        </section>  
 
-        <footer>
-            <p>&copy; 2025 Gatito Sentimental. Hecho con ❤️</p>
-        </footer>
-    </div>
+        {% endblock %}  
 
-    <script>
-        // Pequeño script para alternar entre formularios de login y registro
-        document.getElementById('show-register').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelector('.login-section').classList.add('hidden');
-            document.querySelector('.register-section').classList.remove('hidden');
-            // Eliminar la visibilidad de los mensajes flash al cambiar de sección
-            const flashMessages = document.querySelector('.flash-messages');
-            if (flashMessages) flashMessages.innerHTML = '';
-        });
+    </main>  
 
-        document.getElementById('show-login').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelector('.register-section').classList.add('hidden');
-            document.querySelector('.login-section').classList.remove('hidden');
-            // Eliminar la visibilidad de los mensajes flash al cambiar de sección
-            const flashMessages = document.querySelector('.flash-messages');
-            if (flashMessages) flashMessages.innerHTML = '';
-        });
+    <footer>  
+        <p>&copy; 2025 Gatito Sentimental. Hecho con ❤️</p>  
+    </footer>  
+</div>  
 
-        function togglePasswordVisibility(id) {
-            const input = document.getElementById(id);
-            const toggle = input.nextElementSibling; // El span es el siguiente hermano
+<script>  
+    // Pequeño script para alternar entre formularios de login y registro  
+    document.getElementById('show-register').addEventListener('click', function(e) {  
+        e.preventDefault();  
+        document.querySelector('.login-section').classList.add('hidden');  
+        document.querySelector('.register-section').classList.remove('hidden');  
+        const flashMessages = document.querySelector('.flash-messages');  
+        if (flashMessages) flashMessages.innerHTML = '';  
+    });  
 
-            if (input.type === "password") {
-                input.type = "text";
-                toggle.textContent = "🙈"; // Icono de ojo tachado
-            } else {
-                input.type = "password";
-                toggle.textContent = "👁️"; // Icono de ojo
-            }
-        }
-    </script>
-</body>
-</html>
+    document.getElementById('show-login').addEventListener('click', function(e) {  
+        e.preventDefault();  
+        document.querySelector('.register-section').classList.add('hidden');  
+        document.querySelector('.login-section').classList.remove('hidden');  
+        const flashMessages = document.querySelector('.flash-messages');  
+        if (flashMessages) flashMessages.innerHTML = '';  
+    });  
+
+    function togglePasswordVisibility(id, toggleElement) {  
+        const input = document.getElementById(id);  
+        const openEyeSrc = "{{ url_for('static', filename='images/open-eye.png') }}";  
+        const closedEyeSrc = "{{ url_for('static', filename='images/closed-eye.png') }}";  
+
+        if (input.type === "password") {  
+            input.type = "text";  
+            toggleElement.src = openEyeSrc;  
+            toggleElement.alt = "Ocultar contraseña";  
+        } else {  
+            input.type = "password";  
+            toggleElement.src = closedEyeSrc;  
+            toggleElement.alt = "Mostrar contraseña";  
+        }  
+    }  
+</script>
+
+</body>  
+</html>  

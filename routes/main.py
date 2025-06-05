@@ -1,5 +1,6 @@
+# routes/main.py (Este maneja las rutas principales como el chat)
 
-from flask import render_template, redirect, url_for, session, request, flash
+from flask import render_template, redirect, url_for, session, request, flash, current_app
 from . import main_bp # Importamos el Blueprint
 from utilities import login_required # Importamos el decorador
 
@@ -20,4 +21,14 @@ def chat():
     if not session.get('email_confirmed'):
         flash('Necesitas confirmar tu correo electrónico para acceder al chat. Revisa tu bandeja de entrada.', 'error')
         return redirect(url_for('main.index'))
+
     return render_template('chat.html', username=session['username'])
+
+   
+@main_bp.route('/terms')
+def terms():
+    return render_template('legal/terms.html')
+
+@main_bp.route('/privacy')
+def privacy():
+    return render_template('legal/privacy.html')
