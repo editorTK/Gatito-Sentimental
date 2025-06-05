@@ -28,6 +28,18 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+class ConfirmationToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    token = db.Column(db.String(100), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+    expires_at = db.Column(db.DateTime, default=lambda: datetime.datetime.now() + datetime.timedelta(hours=1))
+
+    user = db.relationship('User', backref=db.backref('confirmation_tokens', lazy=True))
+
+    def __repr__(self):
+        return f'<ConfirmationToken {self.token}>'
+
 class PasswordResetToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
