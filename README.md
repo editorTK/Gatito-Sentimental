@@ -1,6 +1,6 @@
 # 🐱 Gatito Sentimental
 
-**Gatito Sentimental** es una pequeña aplicación web en desarollador hecha con Flask. Por el momento,  Incluye autenticación, verificación por correo electrónico, roles de usuario, seguridad básica contra bots, y un panel administrativo. 
+**Gatito Sentimental** es una pequeña aplicación web en desarollo hecha con Flask. Por el momento,  Incluye autenticación, verificación por correo electrónico, roles de usuario, seguridad básica contra bots, y un panel administrativo. 
 
 
 ---
