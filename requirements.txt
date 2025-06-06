@@ -5,3 +5,4 @@ Flask-SocketIO
 python-dotenv
 gunicorn
 eventlet==0.33.3
+psycopg2-binary==2.9.9
