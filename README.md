@@ -1,21 +1,58 @@
 # 🐱 Gatito Sentimental
 
-**Gatito Sentimental** es una pequeña aplicación web en desarollo hecha con Flask. Por el momento,  Incluye autenticación, verificación por correo electrónico, roles de usuario, seguridad básica contra bots, y un panel administrativo. 
+**Gatito Sentimental** es una aplicación web de ejemplo desarrollada con el framework Flask. Su objetivo es mostrar una implementación sencilla de un sistema de chat con autenticación, confirmación de correo electrónico y gestión de usuarios a través de un panel de administración. El proyecto se encuentra en desarrollo, aunque ya ofrece todas las funcionalidades básicas para experimentar o aprender.
 
 
 ---
 
 ## 🌐 Funcionalidades principales
 
-- ✔️ Registro con verificación de correo (enlace con token)
-- 🔐 Inicio de sesión con control de intentos fallidos
-- 🛡️ Protección básica contra bots y ataques de fuerza bruta
-- 💬 Chat para usuarios registrados y confirmados
-- 🧑‍💼 Panel de administración para gestionar usuarios y roles
-- 💌 Envío de correos con Flask-Mail
-- 🧠 Estructura basada en Blueprints para escalabilidad
+- ✔️ Registro de usuarios con verificación de correo (enlace con token).
+- 🔐 Inicio de sesión protegido con control de intentos fallidos.
+- 🛡️ Medidas elementales contra bots y ataques de fuerza bruta.
+- 💬 Chat disponible para usuarios autenticados y confirmados.
+- 🧑‍💼 Panel para administrar usuarios y asignar roles.
+- 💌 Envío de notificaciones por correo mediante Flask-Mail.
+- 🧠 Estructura modular basada en Blueprints que facilita la escalabilidad.
 
 ---
+
+## 📋 Requisitos previos
+
+- Python 3.10 o superior
+- Acceso a un servidor SMTP para el envío de correos
+- Opcionalmente una base de datos PostgreSQL
+
+## 🔧 Instalación
+
+1. Clonar este repositorio
+2. Crear y activar un entorno virtual
+3. Instalar las dependencias con `pip install -r requirements.txt`
+4. Configurar las variables de entorno necesarias (ver sección siguiente)
+
+## ▶️ Ejecución
+
+Para desarrollo local se puede lanzar directamente:
+
+```bash
+python app.py
+```
+
+En producción se recomienda usar un servidor WSGI como Gunicorn:
+
+```bash
+gunicorn wsgi:app
+```
+
+## ⚙️ Configuración
+
+Las principales variables de entorno son:
+
+- `FLASK_SECRET_KEY`: clave secreta para Flask
+- `DATABASE_URL`: URL de la base de datos (por defecto SQLite)
+- `MAIL_SERVER`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`: datos para el servidor de correo
+- `LOGIN_ATTEMPTS_LIMIT` y `LOCKOUT_DURATION_MINUTES`: parámetros de seguridad
+
 ---
 
 ## 📂 Detalle por archivo
@@ -80,3 +117,9 @@ Define los modelos de base de datos:
 - Decoradores personalizados:
   - `@login_required`: protege rutas privadas.
   - `@admin_required`: permite acceso solo a administradores.
+
+---
+
+## 🤝 Contribuciones
+
+Las contribuciones y sugerencias son bienvenidas. Puedes abrir un issue o enviar un pull request si deseas mejorar el proyecto.
