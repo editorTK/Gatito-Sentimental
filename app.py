@@ -57,4 +57,9 @@ if __name__ == '__main__':
 
     # Usar eventlet para un servidor de WebSockets más robusto
     # allow_unsafe_werkzeug=True solo para desarrollo
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+
+import os
+
+if os.environ.get("RENDER", "") == "true":
+    from create_tables import *  # Ejecuta la creación de tablas al iniciar en Render
