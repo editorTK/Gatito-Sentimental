@@ -45,16 +45,31 @@ if __name__ == '__main__':
     app, socketio = create_app()
 
     with app.app_context():
-        db.create_all() # Crea las tablas en la base de datos si no existen
+        db.create_all()  # Crea las tablas en la base de datos si no existen
         app.logger.info("Base de datos creada o actualizada.")
 
         # Puedes verificar si ya hay un admin.
         # Si no hay admins, el primer usuario que se registre será el admin.
         if User.query.filter_by(role='admin').first() is None:
             app.logger.warning("\n¡ATENCIÓN! No hay administradores registrados.")
-            app.logger.warning("El PRIMER usuario que se registre será automáticamente asignado como administrador.")
-            app.logger.warning("Asegúrate de registrarte tú primero para tener acceso de admin.\n")
+            app.logger.warning(
+                "El PRIMER usuario que se registre será automáticamente asignado como administrador."
+            )
+            app.logger.warning(
+                "Asegúrate de registrarte tú primero para tener acceso de admin.\n"
+            )
 
     # Usar eventlet para un servidor de WebSockets más robusto
     # allow_unsafe_werkzeug=True solo para desarrollo
-    socketio.run(app, host='0.0.0.0', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=5000,
+        debug=True,
+        allow_unsafe_werkzeug=True,
+    )
+
+import os
+
+if os.environ.get("RENDER", "") == "true":
+    from create_tables import *  # Ejecuta la creación de tablas al iniciar en Render
